@@ -1,5 +1,5 @@
 ---
-const { isLoggedIn, user } = Astro.locals;
+const { isLoggedIn, isAdmin } = Astro.locals;
 ---
 
 <!-- component -->
@@ -11,7 +11,7 @@ const { isLoggedIn, user } = Astro.locals;
         <a href="/">Home</a>
       </li>
       {
-        isLoggedIn && (
+        isAdmin && (
           <li class="font-semibold text-gray-700">
             <a href="/admin/dashboard">Admin</a>
           </li>

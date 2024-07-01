@@ -9,11 +9,10 @@ export const onRequest = defineMiddleware(
     const isLoggedIn = !!session;
     const user = session?.user;
 
-    console.log({ user });
-
     // TODO:
     locals.isLoggedIn = isLoggedIn;
     locals.user = null;
+    locals.isAdmin = false;
 
     if (user) {
       // TODO:
@@ -22,11 +21,11 @@ export const onRequest = defineMiddleware(
         email: user.email!,
       };
 
-      // locals.isAdmin = user.role === 'admin'
+      locals.isAdmin = user.role === 'admin';
     }
 
     // TODO: Eventualmente tenemos que controlar el acceso por roles
-    if (!isLoggedIn && url.pathname.startsWith('/dashboard')) {
+    if (!locals.isAdmin && url.pathname.startsWith('/dashboard')) {
       return redirect('/');
     }
 
