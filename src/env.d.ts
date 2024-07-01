@@ -3,15 +3,15 @@
 /// <reference types="astro/client" />
 
 interface User {
-  email: string;
   name: string;
-  avatar: string;
-  emailVerified: boolean;
+  email: string;
+  // TODO:
 }
 
 declare namespace App {
   interface Locals {
     isLoggedIn: boolean;
+    isAdmin: boolean;
     user: User | null;
   }
 }
