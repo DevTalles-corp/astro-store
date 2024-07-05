@@ -1,0 +1,132 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import ProductSlideshow from '@/components/products/ProductSlideshow.astro';
+import { actions } from 'astro:actions';
+
+const { slug } = Astro.params;
+
+const { data, error } = await actions.getProductBySlug.safe(slug ?? '');
+if (error) {
+  return Astro.redirect('/404');
+}
+
+const { product, images } = data;
+---
+
+<MainLayout title={product.title} description={product.description}>
+  <!-- image={image} -->
+
+  <!-- <h1>{product.title}</h1> -->
+
+  <div class="grid grid-cols-1 md:grid-cols-3 w-full gap-4">
+    <ProductSlideshow images={images} />
+
+    <section>
+      <h2 class="text-2xl font-bold">{product.title}</h2>
+      <h2 class="font-bold">${product.price}</h2>
+
+      <h3 class="mt-5">Tallas</h3>
+      <ul class="flex gap-3">
+        {
+          product.sizes
+            .split(',')
+            .map((size) => <li data-size={size}>{size}</li>)
+        }
+      </ul>
+
+      <h3 class="mt-5">Cantidad</h3>
+      <div>
+        <button class="btn-quantity">-</button>
+        <input type="number" min="1" value="1" />
+        <button class="btn-quantity">+</button>
+      </div>
+
+      <button class="mt-5 bg-blue-500 text-white p-3 w-full"
+        >Añadir al carrito</button
+      >
+
+      <h3 class="mt-10">Descripción</h3>
+      <p>{product.description}</p>
+    </section>
+  </div>
+
+  <input type="hidden" id="product-id" value={product.id} />
+</MainLayout>
+
+<script>
+  const sizeElements = document.querySelectorAll('li');
+
+  sizeElements.forEach((liElement) => {
+    liElement.addEventListener('click', () => {
+      sizeElements.forEach((s) => s.classList.remove('selected-size'));
+      liElement.classList.add('selected-size');
+    });
+  });
+
+  const quantityInput = document.querySelector('input') as HTMLInputElement;
+  const productIdInput = document.querySelector(
+    '#product-id'
+  ) as HTMLInputElement;
+
+  let quantity = 1;
+
+  const [decrementButton, incrementButton, addToCardButton] =
+    document.querySelectorAll('button');
+
+  incrementButton.addEventListener('click', () => {
+    quantity = Math.min(quantity + 1, 5);
+    quantityInput.value = quantity.toString();
+  });
+
+  decrementButton.addEventListener('click', () => {
+    quantity = Math.max(quantity - 1, 1);
+    quantityInput.value = quantity.toString();
+  });
+
+  addToCardButton.addEventListener('click', () => {
+    const size = document.querySelector('.selected-size')?.textContent;
+    if (!size) {
+      return alert('Seleccione una talla');
+    }
+
+    addToCardButton.disabled = true;
+
+    console.log({
+      id: productIdInput.value,
+      size: size,
+      quantity: quantity,
+    });
+  });
+</script>
+
+<style>
+  h3 {
+    @apply font-bold;
+  }
+
+  li {
+    @apply hover:underline cursor-pointer;
+  }
+
+  .selected-size {
+    @apply text-blue-500 underline font-bold transition-all;
+  }
+
+  .btn-quantity {
+    @apply w-10 text-center p-2 border border-gray-300 hover:bg-gray-100 cursor-pointer;
+  }
+
+  input {
+    @apply w-16 text-center p-2 border border-gray-300;
+  }
+
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield; /* Para Firefox */
+  }
+</style>
