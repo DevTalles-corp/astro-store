@@ -55,6 +55,8 @@ const { product, images } = data;
 </MainLayout>
 
 <script>
+  import { CartCookiesClient } from '@/utils';
+
   const sizeElements = document.querySelectorAll('li');
 
   sizeElements.forEach((liElement) => {
@@ -92,11 +94,14 @@ const { product, images } = data;
 
     addToCardButton.disabled = true;
 
-    console.log({
-      id: productIdInput.value,
+    CartCookiesClient.addItem({
+      productId: productIdInput.value,
       size: size,
       quantity: quantity,
     });
+
+    // TODO: cambiar luego cuando tengamos los ViewTransitions
+    window.location.href = '/cart';
   });
 </script>
 
