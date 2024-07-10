@@ -11,9 +11,17 @@ if (error) {
 }
 
 const { product, images } = data;
+
+const image = images[0].image.startsWith('http')
+  ? images[0].image
+  : `${import.meta.env.PUBLIC_URL}/images/products/${images[0].image}`;
 ---
 
-<MainLayout title={product.title} description={product.description}>
+<MainLayout
+  title={product.title}
+  description={product.description}
+  image={image}
+>
   <!-- image={image} -->
 
   <!-- <h1>{product.title}</h1> -->
