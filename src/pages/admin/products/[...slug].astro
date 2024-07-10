@@ -275,6 +275,14 @@ const { product, images } = data;
   document.addEventListener('astro:page-load', () => {
     const form = document.querySelector('form') as HTMLFormElement;
     const sizeButtons = document.querySelectorAll('.btn-size');
+    const btnsDeleteImage = document.querySelectorAll('.btn-delete-image');
+    const lblSelectedFiles = document.querySelector(
+      '#lbl-selected-files'
+    ) as HTMLParagraphElement;
+    const dropZone = document.querySelector('#drop-zone') as HTMLLabelElement;
+    const fileInput = document.querySelector(
+      '#file-upload'
+    ) as HTMLInputElement;
 
     if (!form) {
       return;
@@ -304,7 +312,6 @@ const { product, images } = data;
     });
 
     // Eliminar imagenes
-    const btnsDeleteImage = document.querySelectorAll('.btn-delete-image');
 
     btnsDeleteImage.forEach((btn) => {
       btn.addEventListener('click', async (e) => {
@@ -326,13 +333,6 @@ const { product, images } = data;
     });
 
     // Drag & Drop
-    const lblSelectedFiles = document.querySelector(
-      '#lbl-selected-files'
-    ) as HTMLParagraphElement;
-    const dropZone = document.querySelector('#drop-zone') as HTMLLabelElement;
-    const fileInput = document.querySelector(
-      '#file-upload'
-    ) as HTMLInputElement;
 
     const preventDefaults = (e: DragEvent) => {
       e.preventDefault();
