@@ -1,0 +1,303 @@
+---
+import ProductImage from '@/components/products/ProductImage.astro';
+import ProductSlideshow from '@/components/products/ProductSlideshow.astro';
+import MainLayout from '@/layouts/MainLayout.astro';
+import { actions } from 'astro:actions';
+
+const { slug } = Astro.params;
+
+const { data, error } = await actions.getProductBySlug.safe(slug ?? '');
+
+if (error) {
+  return Astro.redirect('/404');
+}
+
+const { product, images } = data;
+---
+
+<MainLayout title="Mantenimiento de producto">
+  <h1>{product.title}</h1>
+  <a href="javascript:history.back()" class="text-blue-500">← Volver</a>
+
+  <form class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <input type="hidden" name="id" value={product.id} />
+
+    <!-- Datos generales -->
+    <div class="mt-2">
+      <h2 class="text-lg font-semibold">Datos generales</h2>
+
+      <!-- Titulo -->
+      <div class="mb-4">
+        <label for="title" class="block">Título</label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          value={product.title}
+          class="w-full p-2 border border-gray-300 rounded"
+        />
+      </div>
+
+      <!-- Slug -->
+      <div class="mb-4">
+        <label for="slug" class="block">Slug</label>
+        <input
+          type="text"
+          id="slug"
+          name="slug"
+          value={product.slug}
+          class="w-full p-2 border border-gray-300 rounded"
+        />
+      </div>
+
+      <!-- Descripción -->
+      <div class="mb-4">
+        <label for="description" class="block">Descripción</label>
+        <textarea
+          id="description"
+          name="description"
+          class="w-full p-2 border border-gray-300 rounded"
+          rows="8">{product.description}</textarea
+        >
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <!-- Precio -->
+        <div class="mb-4">
+          <label for="price" class="block">Precio</label>
+          <input
+            type="number"
+            id="price"
+            name="price"
+            value={product.price}
+            class="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+
+        <!-- Inventario -->
+        <div class="mb-4">
+          <label for="stock" class="block">Inventario</label>
+          <input
+            type="number"
+            id="stock"
+            name="stock"
+            value={product.stock}
+            class="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+      </div>
+
+      <!-- Labels -->
+      <div class="mb-4">
+        <label for="tags" class="block"
+          >Etiquetas <small class="text-gray-500">(Separado por comas)</small
+          ></label
+        >
+        <input
+          type="text"
+          id="tags"
+          name="tags"
+          value={product.tags}
+          class="w-full p-2 border border-gray-300 rounded"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Gender -->
+        <div class="mb-4">
+          <label for="gender" class="block">Sexo</label>
+          <select
+            class="w-full p-2 border border-gray-300 rounded"
+            name="gender"
+          >
+            <option value="">[ Seleccione ]</option>
+            {
+              ['men', 'women', 'unisex', 'kid'].map((gender) => (
+                <option
+                  value={gender}
+                  class="capitalize"
+                  selected={gender === product.gender}
+                >
+                  {gender.toUpperCase()}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+
+        <!-- Type -->
+        <div class="mb-4">
+          <label for="tags" class="block">Tipo</label>
+          <select class="w-full p-2 border border-gray-300 rounded" name="type">
+            <option value="">[ Seleccione ]</option>
+            {
+              ['shirts', 'shirt', 'pants', 'hats', 'hoodies'].map((type) => (
+                <option
+                  value={type}
+                  class="capitalize"
+                  selected={type === product.type}
+                >
+                  {type.toUpperCase()}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Tallas -->
+      <div class="mb-4">
+        <label for="sizes" class="block">Tallas</label>
+        <div class="flex">
+          {
+            ['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+              <button
+                type="button"
+                class="btn-size"
+                onclick="this.classList.toggle('active')"
+                class:list={
+                  product.sizes.split(',').includes(size) ? 'active' : ''
+                }
+              >
+                {size}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Imagenes -->
+    <div>
+      <!-- File upload -->
+      <div class="mt-4">
+        <!-- Guardar  -->
+        <div class="flex justify-end">
+          <button class="bg-blue-500 mb-5 p-2 rounded text-white"
+            >Guardar producto</button
+          >
+        </div>
+
+        <!-- File input -->
+        <div class="flex items-center justify-center w-full">
+          <label
+            for="file-upload"
+            class="flex flex-col items-center justify-center w-full h-52 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100"
+            id="drop-zone"
+          >
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+              <svg
+                class="w-8 h-8 mb-4 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 16V4a2 2 0 012-2h6a2 2 0 012 2v12m-6 4l-4-4m0 0l4-4m-4 4h12"
+                ></path>
+              </svg>
+              <p class="mb-2 text-sm text-gray-500" id="lbl-selected-files">
+                <span class="font-semibold">Click aquí </span> o arrastra los archivos
+              </p>
+              <p class="text-xs text-gray-500">
+                SVG, PNG, JPG or GIF (max. 800x400px)
+              </p>
+            </div>
+
+            <!-- class="hidden" -->
+            <!-- accept only images -->
+            <input
+              id="file-upload"
+              name="imageFiles"
+              type="file"
+              accept="image/*"
+              multiple
+            />
+          </label>
+        </div>
+
+        <!-- Slideshow -->
+        <ProductSlideshow images={images} />
+
+        <table class="w-full border">
+          <thead>
+            <tr>
+              <th>Imagen</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              images.map((image) => (
+                <tr class="border">
+                  <td class="flex justify-center">
+                    <ProductImage
+                      src={image}
+                      alt={product.title}
+                      className="w-16 h-16 rounded"
+                    />
+                  </td>
+                  <td class="text-center">
+                    <button class="btn-delete-image">X</button>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </form>
+
+  <style>
+    .btn-size,
+    .btn-delete-image {
+      @apply rounded border cursor-pointer border-gray-300 w-10 h-10 mr-4 hover:bg-blue-300 hover:text-white transition-all;
+    }
+
+    .active {
+      @apply bg-blue-500 text-white;
+    }
+  </style>
+</MainLayout>
+
+<script>
+  import { actions } from 'astro:actions';
+  import { navigate } from 'astro:transitions/client';
+
+  document.addEventListener('astro:page-load', () => {
+    const form = document.querySelector('form') as HTMLFormElement;
+    const sizeButtons = document.querySelectorAll('.btn-size');
+
+    if (!form) {
+      return;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const selectedSizes = Array.from(sizeButtons)
+        .filter((btn) => btn.classList.contains('active'))
+        .map((btn) => btn.textContent?.trim())
+        .join(',');
+
+      const formData = new FormData(form);
+      formData.set('sizes', selectedSizes);
+
+      const formValues = Object.fromEntries(formData.entries());
+      console.log(formValues);
+
+      const { data, error } = await actions.createUpdateProduct.safe(formData);
+
+      if (error) {
+        return alert(error.message);
+      }
+
+      navigate(`/admin/products/${data.slug}`);
+    });
+  });
+</script>
