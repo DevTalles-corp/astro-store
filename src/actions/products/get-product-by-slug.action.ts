@@ -41,7 +41,8 @@ export const getProductBySlug = defineAction({
 
     return {
       product: product,
-      images: images.map((i) => i.image),
+      images: images,
+      // images: images.map((i) => i.image),
     };
   },
 });
