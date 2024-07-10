@@ -1,8 +1,18 @@
+import { ImageUpload } from '@/utils/image-upload';
 import { defineAction, z } from 'astro:actions';
-import { db, eq, Product } from 'astro:db';
+import { db, eq, Product, ProductImage } from 'astro:db';
 import { getSession } from 'auth-astro/server';
 
 import { v4 as UUID } from 'uuid';
+
+const MAX_FILE_SIZE = 5_000_000; // 5 MB
+const ACCEPTED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/svg+xml',
+];
 
 export const createUpdateProduct = defineAction({
   accept: 'form',
@@ -18,7 +28,18 @@ export const createUpdateProduct = defineAction({
     title: z.string(),
     type: z.string(),
 
-    // TODO: Imagen
+    imageFiles: z
+      .array(
+        z
+          .instanceof(File)
+          .refine((file) => file.size <= MAX_FILE_SIZE, 'Max image size 5MB')
+          .refine((file) => {
+            if (file.size === 0) return true;
+
+            return ACCEPTED_IMAGE_TYPES.includes(file.type);
+          }, `Only supported image files are valid, ${ACCEPTED_IMAGE_TYPES.join(',')}`)
+      )
+      .optional(),
   }),
   handler: async (form, { request }) => {
     const session = await getSession(request);
@@ -28,7 +49,7 @@ export const createUpdateProduct = defineAction({
       throw new Error('Unauthorized');
     }
 
-    const { id = UUID(), ...rest } = form;
+    const { id = UUID(), imageFiles, ...rest } = form;
     rest.slug = rest.slug.toLowerCase().replaceAll(' ', '-').trim();
 
     const product = {
@@ -37,13 +58,44 @@ export const createUpdateProduct = defineAction({
       ...rest,
     };
 
-    console.log({ product });
+    const queries: any = [];
 
-    await db.update(Product).set(product).where(eq(Product.id, id));
+    if (!form.id) {
+      queries.push(db.insert(Product).values(product));
+    } else {
+      queries.push(db.update(Product).set(product).where(eq(Product.id, id)));
+    }
 
-    // Crear
-    // Update
-    // Insert de imágenes
+    // Imágenes
+    const secureUrls: string[] = [];
+    if (
+      form.imageFiles &&
+      form.imageFiles.length > 0 &&
+      form.imageFiles[0].size > 0
+    ) {
+      const urls = await Promise.all(
+        form.imageFiles.map((file) => ImageUpload.upload(file))
+      );
+
+      secureUrls.push(...urls);
+    }
+
+    secureUrls.forEach((imageUrl) => {
+      const imageObj = {
+        id: UUID(),
+        image: imageUrl,
+        productId: product.id,
+      };
+      queries.push(db.insert(ProductImage).values(imageObj));
+    });
+
+    // imageFiles?.forEach(async (imageFile) => {
+    //   if (imageFile.size <= 0) return;
+
+    //   const url = await ImageUpload.upload(imageFile);
+    // });
+
+    await db.batch(queries);
 
     return product;
   },

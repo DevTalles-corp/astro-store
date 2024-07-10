@@ -22,6 +22,7 @@
     "astro": "^4.11.3",
     "auth-astro": "^4.1.2",
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.2.0",
     "js-cookie": "^3.0.5",
     "nanostores": "^0.10.3",
     "react": "^18.3.1",
