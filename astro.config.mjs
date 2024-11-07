@@ -7,11 +7,8 @@ import auth from "auth-astro";
 import react from "@astrojs/react";
 
 // https://astro.build/config
-export default defineConfig({
-  integrations: [tailwind(), db(), auth(), react()],
+export default defineConfig( {
+  integrations: [ tailwind(), db(), auth(), react() ],
   output: "server",
   adapter: netlify(),
-  experimental: {
-    actions: true
-  }
-});
+} );
