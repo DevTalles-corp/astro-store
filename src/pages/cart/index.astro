@@ -8,6 +8,8 @@ const productsInCartCookie = Astro.cookies.get('cart')?.json() ?? [];
 const { data: products, error } =
   await actions.loadProductsFromCart(productsInCartCookie);
 
+console.log({ products, error });
+
 if (error || !products) {
   return Astro.redirect('/');
 }
