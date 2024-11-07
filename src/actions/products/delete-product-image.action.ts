@@ -1,5 +1,7 @@
 import { ImageUpload } from '@/utils/image-upload';
-import { defineAction, z } from 'astro:actions';
+import { defineAction } from 'astro:actions';
+import { z } from 'astro:schema';
+
 import { db, eq, ProductImage } from 'astro:db';
 import { getSession } from 'auth-astro/server';
 

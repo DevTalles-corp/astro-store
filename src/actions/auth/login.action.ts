@@ -1,4 +1,5 @@
-import { defineAction, z } from 'astro:actions';
+import { defineAction } from 'astro:actions';
+import { z } from 'astro:schema';
 
 export const loginUser = defineAction({
   accept: 'form',
