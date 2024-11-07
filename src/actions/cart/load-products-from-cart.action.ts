@@ -1,17 +1,25 @@
-import type { CartItem } from '@/interfaces';
 import { defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
-
+import type { CartItem } from '@/interfaces';
 import { db, eq, inArray, Product, ProductImage } from 'astro:db';
 
 export const loadProductsFromCart = defineAction({
   accept: 'json',
   // input: z.string(),
-  handler: async (_, { cookies }) => {
-    const cart = JSON.parse(cookies.get('cart')?.value ?? '[]') as CartItem[];
+  input: z.array(
+    z.object({
+      productId: z.string(),
+      size: z.string(),
+      quantity: z.number(),
+    })
+  ),
+  handler: async (cart, { cookies }) => {
+    // const cart = JSON.parse(cookies.get('cart')?.value ?? '[]') as CartItem[];
+
     if (cart.length === 0) return [];
 
     // Load products
+
     const productIds = cart.map((item) => item.productId);
 
     const dbProducts = await db

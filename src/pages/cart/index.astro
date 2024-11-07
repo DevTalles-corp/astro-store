@@ -3,7 +3,10 @@ import { actions } from 'astro:actions';
 import MainLayout from '@/layouts/MainLayout.astro';
 import { Formatter } from '@/utils';
 
-const { data: products, error } = await actions.loadProductsFromCart();
+const productsInCartCookie = Astro.cookies.get('cart')?.json() ?? [];
+
+const { data: products, error } =
+  await actions.loadProductsFromCart(productsInCartCookie);
 
 if (error || !products) {
   return Astro.redirect('/');
