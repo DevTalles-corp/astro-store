@@ -3,7 +3,7 @@ import { actions } from 'astro:actions';
 import MainLayout from '@/layouts/MainLayout.astro';
 import { Formatter } from '@/utils';
 
-const { data: products, error } = await actions.loadProductsFromCart.safe();
+const { data: products, error } = await actions.loadProductsFromCart();
 
 if (error || !products) {
   return Astro.redirect('/');

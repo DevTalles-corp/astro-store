@@ -7,7 +7,7 @@ import { ProductList } from '@/components';
 const searchParams = Astro.url.searchParams;
 const pageParam = Number(searchParams.get('page') ?? 1);
 
-const { data, error } = await actions.getProductsByPage.safe({
+const { data, error } = await actions.getProductsByPage({
   page: pageParam,
 });
 

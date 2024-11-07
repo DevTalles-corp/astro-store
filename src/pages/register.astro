@@ -100,7 +100,7 @@ import AuthLayout from '@/layouts/AuthLayout.astro';
 
     const formData = new FormData(form);
 
-    const { error } = await actions.registerUser.safe(formData);
+    const { error } = await actions.registerUser(formData);
 
     if (error) {
       Swal.fire({

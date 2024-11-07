@@ -6,7 +6,7 @@ import { actions } from 'astro:actions';
 
 const { slug } = Astro.params;
 
-const { data, error } = await actions.getProductBySlug.safe(slug ?? '');
+const { data, error } = await actions.getProductBySlug(slug ?? '');
 
 if (error) {
   return Astro.redirect('/404');
@@ -302,7 +302,7 @@ const { product, images } = data;
       const formValues = Object.fromEntries(formData.entries());
       console.log(formValues);
 
-      const { data, error } = await actions.createUpdateProduct.safe(formData);
+      const { data, error } = await actions.createUpdateProduct(formData);
 
       if (error) {
         return alert(error.message);
@@ -318,7 +318,7 @@ const { product, images } = data;
         const id = btn.getAttribute('data-id');
         if (!id) return;
 
-        const { error } = await actions.deleteProductImage.safe(id);
+        const { error } = await actions.deleteProductImage(id);
         if (error) {
           console.log(error);
           alert(error);
