@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.7.0",
-    "@astrojs/db": "^0.11.7",
+    "@astrojs/db": "^0.14.3",
     "@astrojs/netlify": "^5.5.4",
     "@astrojs/react": "^3.6.2",
     "@astrojs/tailwind": "^5.1.2",
